@@ -2,22 +2,26 @@
   "channels": [
     {
       "name": "10 Minute School",
-      "url": "https://www.youtube.com/c/10minuteschool/videos",
+      "url": "https://www.youtube.com/@10minuteschool/videos",
+      "channel_id": "UCEHqMG5Vvq5oGKdCvVpECkA",
       "priority": 1
     },
     {
       "name": "Udvash Online",
       "url": "https://www.youtube.com/@UdvashOnline/videos",
+      "channel_id": "",
       "priority": 2
     },
     {
       "name": "Shikho",
       "url": "https://www.youtube.com/@shikhoBD/videos",
+      "channel_id": "",
       "priority": 3
     },
     {
       "name": "Bohubrihi",
       "url": "https://www.youtube.com/@bohubrihi/videos",
+      "channel_id": "",
       "priority": 4
     }
   ]
