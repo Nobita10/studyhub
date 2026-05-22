@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyHub — মনোযোগ দিয়ে পড়ো</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ─── CSS Variables ─── */
+:root {
+  --bg: #0c0e12;
+  --bg2: #13161c;
+  --bg3: #1c2028;
+  --border: #252930;
+  --accent: #f5a623;
+  --accent2: #e8891a;
+  --text: #e8eaf0;
+  --text2: #9098a8;
+  --text3: #555e6e;
+  --green: #4caf82;
+  --red: #e05c5c;
+  --radius: 10px;
+  --font: 'Hind Siliguri', sans-serif;
+  --mono: 'Space Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ─── Navbar ─── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(12,14,18,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.5px;
+  cursor: pointer;
+}
+.logo span { color: var(--text2); }
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.search-wrap {
+  position: relative;
+  display: flex; align-items: center;
+}
+.search-input {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px 7px 36px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--text);
+  width: 220px;
+  outline: none;
+  transition: border-color 0.2s, width 0.3s;
+}
+.search-input:focus { border-color: var(--accent); width: 280px; }
+.search-input::placeholder { color: var(--text3); }
+.search-icon {
+  position: absolute; left: 11px;
+  color: var(--text3); font-size: 15px; pointer-events: none;
+}
+.stats-badge {
+  font-family: var(--mono);
+  font-size: 11px; color: var(--text3);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 4px 10px; border-radius: 6px;
+}
+.stats-badge span { color: var(--accent); }
+
+/* ─── Pages ─── */
+.page { display: none; animation: fadeIn 0.25s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── Home Page ─── */
+.home-hero {
+  padding: 56px 24px 40px;
+  text-align: center;
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(245,166,35,0.07) 0%, transparent 70%);
+}
+.hero-label {
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 2px;
+  color: var(--accent); text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.hero-title {
+  font-size: 36px; font-weight: 700;
+  line-height: 1.2; margin-bottom: 12px;
+}
+.hero-title em { color: var(--accent); font-style: normal; }
+.hero-sub { font-size: 15px; color: var(--text2); max-width: 460px; margin: 0 auto 32px; line-height: 1.7; }
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  padding: 0 24px 48px;
+  max-width: 1100px; margin: 0 auto;
+}
+.subject-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, background 0.2s;
+  position: relative; overflow: hidden;
+}
+.subject-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--subject-color, var(--accent));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.2s;
+}
+.subject-card:hover { border-color: var(--subject-color, var(--accent)); background: var(--bg3); transform: translateY(-2px); }
+.subject-card:hover::before { transform: scaleX(1); }
+.subj-icon { font-size: 28px; margin-bottom: 12px; }
+.subj-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+.subj-meta { font-size: 12px; color: var(--text3); }
+.subj-progress {
+  margin-top: 14px;
+  height: 3px; background: var(--bg3); border-radius: 2px; overflow: hidden;
+}
+.subj-progress-bar {
+  height: 100%; border-radius: 2px;
+  background: var(--subject-color, var(--accent));
+  transition: width 0.4s ease;
+}
+
+/* ─── Chapter Page ─── */
+.page-header {
+  padding: 32px 24px 24px;
+  border-bottom: 1px solid var(--border);
+  max-width: 1100px; margin: 0 auto;
+}
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text3); margin-bottom: 12px;
+}
+.breadcrumb a { color: var(--accent); cursor: pointer; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.page-title { font-size: 24px; font-weight: 700; }
+.page-subtitle { font-size: 13px; color: var(--text2); margin-top: 6px; }
+
+.chapters-list {
+  padding: 20px 24px;
+  max-width: 1100px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.chapter-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 12px;
+}
+.chapter-card:hover { border-color: var(--accent); background: var(--bg3); }
+.chapter-num {
+  font-family: var(--mono); font-size: 12px;
+  color: var(--accent); min-width: 28px;
+}
+.chapter-info {}
+.chapter-name { font-size: 14px; font-weight: 500; }
+.chapter-count { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.chapter-watched {
+  margin-left: auto; font-size: 11px; color: var(--green);
+  display: flex; align-items: center; gap: 3px;
+}
+
+/* ─── Video List Page ─── */
+.filter-bar {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  max-width: 1100px; margin: 0 auto;
+}
+.filter-btn {
+  padding: 6px 14px; border-radius: 20px;
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border);
+  background: none; color: var(--text2);
+  cursor: pointer; transition: all 0.15s;
+}
+.filter-btn:hover, .filter-btn.active {
+  background: var(--accent); color: #000; border-color: var(--accent);
+}
+
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  padding: 20px 24px 48px;
+  max-width: 1100px; margin: 0 auto;
+}
+.video-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden; cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.video-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.video-card.watched { opacity: 0.6; }
+.video-card.watched::after {
+  content: '✓ দেখা হয়েছে';
+  position: absolute; top: 8px; right: 8px;
+  background: var(--green); color: #000;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px;
+}
+.thumb-wrap { position: relative; aspect-ratio: 16/9; overflow: hidden; }
+.thumb-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+.video-card:hover .thumb-wrap img { transform: scale(1.03); }
+.thumb-duration {
+  position: absolute; bottom: 6px; right: 6px;
+  background: rgba(0,0,0,0.85); color: #fff;
+  font-family: var(--mono); font-size: 11px;
+  padding: 2px 6px; border-radius: 4px;
+}
+.video-info { padding: 12px; }
+.video-title {
+  font-size: 13px; font-weight: 500; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 8px;
+}
+.video-meta { display: flex; align-items: center; justify-content: space-between; }
+.video-channel {
+  font-size: 11px; color: var(--text3);
+  background: var(--bg3); padding: 2px 8px; border-radius: 4px;
+}
+.video-date { font-size: 11px; color: var(--text3); }
+
+/* ─── Player Page ─── */
+.player-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 0;
+  height: calc(100vh - 56px);
+}
+.player-main { overflow-y: auto; padding: 24px; }
+.player-wrap {
+  position: relative; aspect-ratio: 16/9;
+  background: #000; border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+.player-wrap iframe { width: 100%; height: 100%; border: none; display: block; }
+.player-title { font-size: 20px; font-weight: 600; line-height: 1.4; margin-bottom: 10px; }
+.player-meta-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.player-channel {
+  font-size: 12px; color: var(--text2);
+  background: var(--bg3); padding: 4px 12px; border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.watch-btn {
+  margin-left: auto;
+  padding: 7px 18px; border-radius: 7px;
+  font-family: var(--font); font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: all 0.15s;
+  background: var(--bg3); color: var(--text2);
+}
+.watch-btn.done { background: var(--green); color: #000; border-color: var(--green); }
+.notes-area {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+}
+.notes-label {
+  font-size: 12px; color: var(--text3); font-weight: 500;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.notes-input {
+  width: 100%; background: none; border: none;
+  font-family: var(--font); font-size: 13px;
+  color: var(--text); line-height: 1.7;
+  resize: none; outline: none; min-height: 120px;
+}
+.notes-input::placeholder { color: var(--text3); }
+
+/* ─── Playlist Sidebar ─── */
+.playlist-sidebar {
+  border-left: 1px solid var(--border);
+  background: var(--bg2);
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.sidebar-header {
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px; font-weight: 600;
+  position: sticky; top: 0; background: var(--bg2); z-index: 1;
+}
+.sidebar-video {
+  display: flex; gap: 10px;
+  padding: 10px 14px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.sidebar-video:hover { background: var(--bg3); }
+.sidebar-video.current { background: rgba(245,166,35,0.08); border-left: 2px solid var(--accent); }
+.sidebar-video.watched-item { opacity: 0.5; }
+.sidebar-thumb {
+  width: 80px; height: 45px; border-radius: 6px;
+  object-fit: cover; flex-shrink: 0;
+}
+.sidebar-info { flex: 1; min-width: 0; }
+.sidebar-title {
+  font-size: 12px; line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  margin-bottom: 4px;
+}
+.sidebar-meta { font-size: 10px; color: var(--text3); }
+
+/* ─── Search Results ─── */
+.search-results {
+  padding: 20px 24px 48px;
+  max-width: 1100px; margin: 0 auto;
+}
+.search-header {
+  font-size: 14px; color: var(--text2); margin-bottom: 20px;
+}
+.search-header strong { color: var(--accent); }
+
+/* ─── Empty State ─── */
+.empty {
+  text-align: center; padding: 80px 24px;
+  color: var(--text3);
+}
+.empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty h3 { font-size: 16px; color: var(--text2); margin-bottom: 8px; }
+.empty p { font-size: 13px; line-height: 1.7; }
+
+/* ─── Loading ─── */
+.loader {
+  display: flex; align-items: center; justify-content: center;
+  height: 200px; gap: 8px;
+}
+.loader-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent); animation: bounce 1s infinite;
+}
+.loader-dot:nth-child(2) { animation-delay: 0.15s; }
+.loader-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes bounce { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .player-layout { grid-template-columns: 1fr; height: auto; }
+  .playlist-sidebar { display: none; }
+  .hero-title { font-size: 26px; }
+  .search-input { width: 160px; }
+  .search-input:focus { width: 200px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── Navbar ─── -->
+<nav>
+  <div class="logo" onclick="showHome()">Study<span>Hub</span></div>
+  <div class="nav-right">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" placeholder="topic খোঁজো..." id="searchInput" oninput="handleSearch(this.value)">
+    </div>
+    <div class="stats-badge" id="statsBadge"><span>...</span> videos</div>
+  </div>
+</nav>
+
+<!-- ─── Page: Home ─── -->
+<div class="page active" id="page-home">
+  <div class="home-hero">
+    <div class="hero-label">HSC Study Platform</div>
+    <h1 class="hero-title">মনোযোগ দিয়ে পড়ো,<br><em>distraction ছাড়া</em></h1>
+    <p class="hero-sub">সেরা Bangladeshi channels-এর HSC videos এক জায়গায়। কোনো recommendation, কোনো comment — শুধু পড়াশোনা।</p>
+  </div>
+  <div class="subjects-grid" id="subjectsGrid">
+    <div class="loader"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div>
+  </div>
+</div>
+
+<!-- ─── Page: Chapters ─── -->
+<div class="page" id="page-chapters">
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a onclick="showHome()">🏠 Home</a>
+      <span>›</span>
+      <span id="chapterSubjectName"></span>
+    </div>
+    <div class="page-title" id="chapterPageTitle"></div>
+    <div class="page-subtitle" id="chapterPageSubtitle"></div>
+  </div>
+  <div class="chapters-list" id="chaptersList"></div>
+</div>
+
+<!-- ─── Page: Videos ─── -->
+<div class="page" id="page-videos">
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a onclick="showHome()">🏠 Home</a>
+      <span>›</span>
+      <a id="videoBreadSubj" onclick=""></a>
+      <span>›</span>
+      <span id="videoBreadChapter"></span>
+    </div>
+    <div class="page-title" id="videosPageTitle"></div>
+    <div class="page-subtitle" id="videosPageSubtitle"></div>
+  </div>
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" onclick="filterVideos('all', this)">সব</button>
+  </div>
+  <div class="videos-grid" id="videosGrid"></div>
+</div>
+
+<!-- ─── Page: Player ─── -->
+<div class="page" id="page-player">
+  <div class="player-layout">
+    <div class="player-main">
+      <div class="player-wrap">
+        <iframe id="playerIframe" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      </div>
+      <div class="player-title" id="playerTitle"></div>
+      <div class="player-meta-row">
+        <span class="player-channel" id="playerChannel"></span>
+        <span class="player-channel" id="playerBreadcrumb" style="cursor:pointer;"></span>
+        <button class="watch-btn" id="watchBtn" onclick="toggleWatched()">✓ দেখা হয়েছে বলো</button>
+      </div>
+      <div class="notes-area">
+        <div class="notes-label">📝 Notes</div>
+        <textarea class="notes-input" id="notesInput" placeholder="এখানে notes লিখো... (auto-save হয়)" oninput="saveNotes()"></textarea>
+      </div>
+    </div>
+    <div class="playlist-sidebar">
+      <div class="sidebar-header" id="sidebarHeader">এই chapter-এর বাকি videos</div>
+      <div id="sidebarList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Page: Search ─── -->
+<div class="page" id="page-search">
+  <div class="search-results">
+    <div class="search-header" id="searchHeader"></div>
+    <div class="videos-grid" id="searchGrid"></div>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────
+let DB = null;  // videos.json data
+let currentSubject = null;
+let currentChapter = null;
+let currentVideo = null;
+let currentPlaylist = [];
+
+// ─── Subject Config ───────────────────────────
+const SUBJECT_CONFIG = {
+  physics:     { name: "পদার্থবিজ্ঞান", icon: "⚡", color: "#5b9cf6" },
+  chemistry:   { name: "রসায়ন",         icon: "🧪", color: "#a78bfa" },
+  biology:     { name: "জীববিজ্ঞান",    icon: "🌿", color: "#4caf82" },
+  higher_math: { name: "উচ্চতর গণিত",   icon: "📐", color: "#f5a623" },
+  ict:         { name: "তথ্য ও যোগাযোগ", icon: "💻", color: "#38bdf8" },
+  english:     { name: "ইংরেজি",         icon: "📖", color: "#f472b6" },
+  bangla:      { name: "বাংলা",          icon: "🔤", color: "#fb923c" },
+  economics:   { name: "অর্থনীতি",       icon: "📊", color: "#34d399" },
+  accounting:  { name: "হিসাববিজ্ঞান",  icon: "🧮", color: "#60a5fa" },
+  civics:      { name: "পৌরনীতি",        icon: "🏛️", color: "#c084fc" },
+  history:     { name: "ইতিহাস",         icon: "📜", color: "#fbbf24" },
+};
+
+// ─── Load Data ───────────────────────────────
+async function loadData() {
+  try {
+    // Production: GitHub raw URL থেকে load করবে
+    // const res = await fetch("https://raw.githubusercontent.com/YOUR_USERNAME/studyhub/main/videos.json");
+    
+    // Development: Mock data দিয়ে দেখাচ্ছি
+    DB = getMockData();
+    renderHome();
+    updateStats();
+  } catch(e) {
+    console.error("Data load failed:", e);
+    document.getElementById("subjectsGrid").innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠️</div>
+        <h3>Data load হয়নি</h3>
+        <p>videos.json পাওয়া যাচ্ছে না। GitHub-এ deploy করার পর ঠিক হবে।</p>
+      </div>`;
+  }
+}
+
+// ─── Stats ───────────────────────────────────
+function updateStats() {
+  const total = DB?.total_videos || 0;
+  document.getElementById("statsBadge").innerHTML = `<span>${total.toLocaleString("bn-BD")}</span> videos`;
+}
+
+// ─── Home Page ───────────────────────────────
+function renderHome() {
+  const grid = document.getElementById("subjectsGrid");
+  if (!DB?.subjects) { grid.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><h3>কোনো video নেই</h3><p>sync.py চালালে videos যোগ হবে।</p></div>'; return; }
+
+  const html = Object.entries(DB.subjects).map(([key, subj]) => {
+    const cfg = SUBJECT_CONFIG[key] || { name: key, icon: "📚", color: "#f5a623" };
+    const totalVideos = Object.values(subj.chapters || {}).reduce((s, ch) => s + ch.videos.length, 0);
+    const chapters = Object.keys(subj.chapters || {}).length;
+    const watched = getWatchedCount(key);
+    const pct = totalVideos ? Math.round(watched / totalVideos * 100) : 0;
+
+    return `<div class="subject-card" style="--subject-color:${cfg.color}" onclick="showChapters('${key}')">
+      <div class="subj-icon">${cfg.icon}</div>
+      <div class="subj-name">${cfg.name}</div>
+      <div class="subj-meta">${chapters} chapter · ${totalVideos} video${watched ? ` · ${pct}% দেখা` : ''}</div>
+      <div class="subj-progress"><div class="subj-progress-bar" style="width:${pct}%;background:${cfg.color}"></div></div>
+    </div>`;
+  }).join("");
+
+  grid.innerHTML = html || '<div class="empty"><div class="empty-icon">📭</div><h3>কোনো subject নেই</h3></div>';
+}
+
+// ─── Chapters Page ───────────────────────────
+function showChapters(subjectKey) {
+  currentSubject = subjectKey;
+  const subj = DB.subjects[subjectKey];
+  const cfg = SUBJECT_CONFIG[subjectKey] || { name: subjectKey, icon: "📚" };
+
+  document.getElementById("chapterSubjectName").textContent = cfg.name;
+  document.getElementById("chapterPageTitle").textContent = cfg.icon + " " + cfg.name;
+  const totalV = Object.values(subj.chapters).reduce((s,c) => s + c.videos.length, 0);
+  document.getElementById("chapterPageSubtitle").textContent = `${Object.keys(subj.chapters).length}টি chapter · ${totalV}টি video`;
+
+  const list = Object.entries(subj.chapters).map(([name, ch], i) => {
+    const watched = ch.videos.filter(v => isWatched(v.id)).length;
+    return `<div class="chapter-card" onclick="showVideos('${subjectKey}','${name}')">
+      <div class="chapter-num">০${i+1}</div>
+      <div class="chapter-info">
+        <div class="chapter-name">${name}</div>
+        <div class="chapter-count">${ch.videos.length}টি video</div>
+      </div>
+      ${watched ? `<div class="chapter-watched">✓ ${watched}/${ch.videos.length}</div>` : ''}
+    </div>`;
+  }).join("");
+
+  document.getElementById("chaptersList").innerHTML = list;
+  showPage("page-chapters");
+}
+
+// ─── Videos Page ─────────────────────────────
+function showVideos(subjectKey, chapterName) {
+  currentSubject = subjectKey;
+  currentChapter = chapterName;
+  const subj = DB.subjects[subjectKey];
+  const ch = subj.chapters[chapterName];
+  const cfg = SUBJECT_CONFIG[subjectKey] || { name: subjectKey };
+
+  document.getElementById("videoBreadSubj").textContent = cfg.name;
+  document.getElementById("videoBreadSubj").onclick = () => showChapters(subjectKey);
+  document.getElementById("videoBreadChapter").textContent = chapterName;
+  document.getElementById("videosPageTitle").textContent = chapterName;
+  document.getElementById("videosPageSubtitle").textContent = `${ch.videos.length}টি video`;
+
+  // Channel filters
+  const channels = [...new Set(ch.videos.map(v => v.channel))];
+  const filterBar = document.getElementById("filterBar");
+  filterBar.innerHTML = `<button class="filter-btn active" onclick="filterVideos('all',this)">সব</button>` +
+    channels.map(c => `<button class="filter-btn" onclick="filterVideos('${c}',this)">${c}</button>`).join("");
+
+  currentPlaylist = ch.videos;
+  renderVideoGrid(ch.videos, "videosGrid");
+  showPage("page-videos");
+}
+
+function filterVideos(channel, btn) {
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  const ch = DB.subjects[currentSubject].chapters[currentChapter];
+  const filtered = channel === "all" ? ch.videos : ch.videos.filter(v => v.channel === channel);
+  renderVideoGrid(filtered, "videosGrid");
+}
+
+function renderVideoGrid(videos, gridId) {
+  const grid = document.getElementById(gridId);
+  if (!videos.length) { grid.innerHTML = '<div class="empty"><div class="empty-icon">🎬</div><h3>কোনো video নেই</h3></div>'; return; }
+  grid.innerHTML = videos.map(v => videoCard(v, gridId === "videosGrid")).join("");
+}
+
+function videoCard(v, withPlaylist=true) {
+  const watched = isWatched(v.id);
+  const thumb = v.thumbnail || `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`;
+  const onclick = withPlaylist
+    ? `playVideo('${v.id}','${currentSubject || ""}','${currentChapter || ""}')`
+    : `playVideoSimple('${v.id}')`;
+  return `<div class="video-card ${watched?'watched':''}" onclick="${onclick}">
+    <div class="thumb-wrap">
+      <img src="${thumb}" alt="" loading="lazy" onerror="this.src='https://i.ytimg.com/vi/${v.id}/hqdefault.jpg'">
+      ${v.duration ? `<span class="thumb-duration">${v.duration}</span>` : ''}
+    </div>
+    <div class="video-info">
+      <div class="video-title">${v.title}</div>
+      <div class="video-meta">
+        <span class="video-channel">${v.channel || ''}</span>
+        <span class="video-date">${v.published || ''}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── Player Page ─────────────────────────────
+function playVideo(videoId, subjectKey, chapterName) {
+  currentSubject = subjectKey;
+  currentChapter = chapterName;
+  if (subjectKey && chapterName) {
+    currentPlaylist = DB.subjects[subjectKey]?.chapters[chapterName]?.videos || [];
+  }
+  openPlayer(videoId);
+}
+
+function playVideoSimple(videoId) {
+  const video = findVideoById(videoId);
+  if (video) openPlayer(videoId);
+}
+
+function openPlayer(videoId) {
+  currentVideo = videoId;
+  const video = findVideoById(videoId) || { title: "Video", channel: "", id: videoId };
+
+  // Distraction-free embed params
+  const params = "rel=0&modestbranding=1&iv_load_policy=3&fs=1&color=white&disablekb=0&autoplay=1";
+  document.getElementById("playerIframe").src = `https://www.youtube-nocookie.com/embed/${videoId}?${params}`;
+  document.getElementById("playerTitle").textContent = video.title;
+  document.getElementById("playerChannel").textContent = video.channel || "";
+
+  const subj = currentSubject ? (SUBJECT_CONFIG[currentSubject]?.name || currentSubject) : "";
+  document.getElementById("playerBreadcrumb").textContent = subj && currentChapter ? `${subj} › ${currentChapter}` : "";
+  document.getElementById("playerBreadcrumb").onclick = () => { if(currentSubject && currentChapter) showVideos(currentSubject, currentChapter); };
+
+  // Watch button state
+  updateWatchBtn();
+
+  // Notes
+  document.getElementById("notesInput").value = localStorage.getItem(`note_${videoId}`) || "";
+
+  // Sidebar playlist
+  renderSidebar();
+  showPage("page-player");
+}
+
+function renderSidebar() {
+  const sidebar = document.getElementById("sidebarList");
+  if (!currentPlaylist.length) { sidebar.innerHTML = ''; return; }
+  document.getElementById("sidebarHeader").textContent = `${currentChapter || 'Playlist'} (${currentPlaylist.length}টি)`;
+  sidebar.innerHTML = currentPlaylist.map(v => {
+    const thumb = v.thumbnail || `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`;
+    const isCurrent = v.id === currentVideo;
+    const watched = isWatched(v.id);
+    return `<div class="sidebar-video ${isCurrent?'current':''} ${watched&&!isCurrent?'watched-item':''}" onclick="openPlayer('${v.id}')">
+      <img class="sidebar-thumb" src="${thumb}" alt="" loading="lazy">
+      <div class="sidebar-info">
+        <div class="sidebar-title">${v.title}</div>
+        <div class="sidebar-meta">${v.channel || ''} ${v.duration ? '· '+v.duration : ''}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ─── Progress Tracker (localStorage) ─────────
+function isWatched(id) { return localStorage.getItem(`watched_${id}`) === "1"; }
+function toggleWatched() {
+  if (!currentVideo) return;
+  const was = isWatched(currentVideo);
+  if (was) localStorage.removeItem(`watched_${currentVideo}`);
+  else localStorage.setItem(`watched_${currentVideo}`, "1");
+  updateWatchBtn();
+  renderSidebar();
+}
+function updateWatchBtn() {
+  const btn = document.getElementById("watchBtn");
+  const done = isWatched(currentVideo);
+  btn.className = "watch-btn" + (done ? " done" : "");
+  btn.textContent = done ? "✓ দেখা হয়েছে" : "✓ দেখা হয়েছে বলো";
+}
+function getWatchedCount(subjectKey) {
+  const subj = DB?.subjects?.[subjectKey];
+  if (!subj) return 0;
+  return Object.values(subj.chapters).reduce((s, ch) =>
+    s + ch.videos.filter(v => isWatched(v.id)).length, 0);
+}
+
+// ─── Notes ───────────────────────────────────
+function saveNotes() {
+  if (!currentVideo) return;
+  const val = document.getElementById("notesInput").value;
+  if (val) localStorage.setItem(`note_${currentVideo}`, val);
+  else localStorage.removeItem(`note_${currentVideo}`);
+}
+
+// ─── Search ───────────────────────────────────
+let searchTimeout;
+function handleSearch(query) {
+  clearTimeout(searchTimeout);
+  if (!query.trim()) { showPage("page-home"); return; }
+  searchTimeout = setTimeout(() => doSearch(query.trim()), 300);
+}
+
+function doSearch(query) {
+  if (!DB) return;
+  const q = query.toLowerCase();
+  const results = [];
+  Object.entries(DB.subjects || {}).forEach(([sk, subj]) => {
+    Object.entries(subj.chapters || {}).forEach(([cn, ch]) => {
+      ch.videos.forEach(v => {
+        if (v.title.toLowerCase().includes(q) || cn.toLowerCase().includes(q) || (v.channel||"").toLowerCase().includes(q)) {
+          results.push({ ...v, _subject: sk, _chapter: cn });
+        }
+      });
+    });
+  });
+
+  document.getElementById("searchHeader").innerHTML = `"<strong>${query}</strong>" এর জন্য ${results.length}টি ফলাফল`;
+  const grid = document.getElementById("searchGrid");
+  if (!results.length) {
+    grid.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><h3>কিছু পাওয়া যায়নি</h3><p>অন্য keyword দিয়ে চেষ্টা করো।</p></div>`;
+  } else {
+    // Temporarily set context for search results
+    grid.innerHTML = results.slice(0, 40).map(v => {
+      const thumb = v.thumbnail || `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`;
+      const watched = isWatched(v.id);
+      return `<div class="video-card ${watched?'watched':''}" onclick="playVideo('${v.id}','${v._subject}','${v._chapter}')">
+        <div class="thumb-wrap">
+          <img src="${thumb}" alt="" loading="lazy">
+          ${v.duration ? `<span class="thumb-duration">${v.duration}</span>` : ''}
+        </div>
+        <div class="video-info">
+          <div class="video-title">${v.title}</div>
+          <div class="video-meta">
+            <span class="video-channel">${v.channel || ''}</span>
+            <span class="video-date">${v._chapter}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+  showPage("page-search");
+}
+
+// ─── Helpers ─────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo(0, 0);
+}
+function showHome() {
+  document.getElementById("searchInput").value = "";
+  showPage("page-home");
+  renderHome(); // refresh progress bars
+}
+function findVideoById(id) {
+  for (const subj of Object.values(DB?.subjects || {}))
+    for (const ch of Object.values(subj.chapters || {}))
+      for (const v of ch.videos)
+        if (v.id === id) return v;
+  return null;
+}
+
+// ─── Mock Data (GitHub deploy-এর পর real data আসবে) ───
+function getMockData() {
+  return {
+    last_updated: "2026-05-22T18:00:00Z",
+    total_videos: 847,
+    subjects: {
+      physics: {
+        chapters: {
+          "ভৌত রাশি ও পরিমাপ": { videos: [
+            { id: "xEEsHsolicU", title: "ভৌত রাশি ও পরিমাপ | HSC Physics Chapter 1 | 10 Minute School", channel: "10 Minute School", duration: "22:14", thumbnail: "", published: "2024-01-15" },
+            { id: "LCcD8hMKZK0", title: "মাত্রা বিশ্লেষণ | HSC Physics | Udvash", channel: "Udvash Online", duration: "18:30", thumbnail: "", published: "2024-01-20" },
+          ]},
+          "গতিবিদ্যা": { videos: [
+            { id: "ZM8ECpBuQYE", title: "গতিবিদ্যা - সরল রৈখিক গতি | HSC Physics | 10MS", channel: "10 Minute School", duration: "25:10", thumbnail: "", published: "2024-02-01" },
+            { id: "qxXf7AJZ73A", title: "নিউটনের গতিসূত্র | HSC Physics | Shikho", channel: "Shikho", duration: "30:45", thumbnail: "", published: "2024-02-10" },
+          ]},
+          "আলো": { videos: [
+            { id: "Hm3JodBR-vs", title: "আলোর প্রতিফলন ও প্রতিসরণ | HSC Physics", channel: "10 Minute School", duration: "28:00", thumbnail: "", published: "2024-03-01" },
+          ]}
+        }
+      },
+      chemistry: {
+        chapters: {
+          "পর্যায় সারণি": { videos: [
+            { id: "O-48znAg7VE", title: "পর্যায় সারণি | HSC Chemistry | 10 Minute School", channel: "10 Minute School", duration: "35:20", thumbnail: "", published: "2024-01-25" },
+          ]},
+          "রাসায়নিক বন্ধন": { videos: [
+            { id: "QqjcCvzWwww", title: "রাসায়নিক বন্ধন - আয়নিক ও সমযোজী | HSC Chem", channel: "Udvash Online", duration: "40:15", thumbnail: "", published: "2024-02-05" },
+          ]}
+        }
+      },
+      biology: {
+        chapters: {
+          "কোষ ও এর গঠন": { videos: [
+            { id: "URUJD5NEXC8", title: "কোষের গঠন ও কাজ | HSC Biology | 10 Minute School", channel: "10 Minute School", duration: "32:00", thumbnail: "", published: "2024-01-30" },
+          ]}
+        }
+      },
+      higher_math: {
+        chapters: {
+          "ম্যাট্রিক্স": { videos: [
+            { id: "rowWM-MijXU", title: "ম্যাট্রিক্স ও নির্ণায়ক | HSC Higher Math", channel: "10 Minute School", duration: "45:00", thumbnail: "", published: "2024-02-20" },
+          ]},
+          "অন্তরকলন": { videos: [
+            { id: "ANyVpMS3HL4", title: "অন্তরকলন - বেসিক ধারণা | HSC Math | Shikho", channel: "Shikho", duration: "38:30", thumbnail: "", published: "2024-03-10" },
+          ]}
+        }
+      },
+      ict: {
+        chapters: {
+          "সংখ্যা পদ্ধতি": { videos: [
+            { id: "1GSjbWt0c9M", title: "সংখ্যা পদ্ধতি | HSC ICT | Bohubrihi", channel: "Bohubrihi", duration: "28:45", thumbnail: "", published: "2024-02-15" },
+          ]}
+        }
+      }
+    },
+    uncategorized: []
+  };
+}
+
+// ─── Init ─────────────────────────────────────
+loadData();
+</script>
+</body>
+</html>

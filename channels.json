@@ -1,0 +1,24 @@
+{
+  "channels": [
+    {
+      "name": "10 Minute School",
+      "url": "https://www.youtube.com/@10minuteschool",
+      "priority": 1
+    },
+    {
+      "name": "Udvash Online",
+      "url": "https://www.youtube.com/@udvashonline",
+      "priority": 2
+    },
+    {
+      "name": "Shikho",
+      "url": "https://www.youtube.com/@shikhoBD",
+      "priority": 3
+    },
+    {
+      "name": "Bohubrihi",
+      "url": "https://www.youtube.com/@bohubrihi",
+      "priority": 4
+    }
+  ]
+}
